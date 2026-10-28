@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-Hant-TW"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#1E262D">
+<title>小石頭牙醫｜致初始團隊的一封信</title>
+<link rel="stylesheet" href="assets/style.css"></head>
+<body><button class="sound" type="button" aria-label="音效開關"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
+<section id="gate"><canvas id="dust"></canvas>
+ <div class="g-kicker">Little Stone Dental</div>
+ <h1 class="g-title">致初始團隊的一封信</h1>
+ <div class="g-sub">A letter to the founding team</div>
+ <div class="envelope">
+  <div class="env-back"></div>
+  <div class="env-letter"><svg class="mini" viewBox="0 0 220 116" aria-hidden="true"></svg><div class="ml">小石頭牙醫</div></div>
+  <div class="env-front"></div>
+  <div class="env-flap"><i></i><b></b></div>
+  <div class="seal"><div class="half l"><svg viewBox="0 0 80 80" style="width:100%;height:100%"><defs><radialGradient id="wx" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#F6D27A"/><stop offset=".55" stop-color="#D9A534"/><stop offset="1" stop-color="#A9781E"/></radialGradient></defs>
+<path d="M40,3 C47,4 51,2 56,6 C62,9 67,10 70,16 C74,22 78,26 77,33 C76,40 79,45 76,51 C73,58 72,63 66,67 C60,71 56,76 49,77 C42,78 37,79 31,76 C24,73 18,72 14,66 C9,60 4,56 4,48 C4,41 1,36 4,29 C7,22 9,17 15,12 C21,8 26,4 33,4 C36,3 38,3 40,3Z" fill="url(#wx)"/>
+<circle cx="40" cy="40" r="25" fill="none" stroke="#9C6E18" stroke-width="1.6" opacity=".7"/>
+<path d="M22,48 L22,40 A18,18 0 0 1 58,40 L58,48 L50,48 L50,41 A10,10 0 0 0 30,41 L30,48Z" fill="#B9862A" stroke="#8A6114" stroke-width=".8"/>
+<path d="M35,22 L45,22 L43,33 L37,33Z" fill="#FBE3A2" stroke="#8A6114" stroke-width=".8"/></svg></div><div class="half r"><svg viewBox="0 0 80 80" style="width:100%;height:100%"><defs><radialGradient id="wx" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#F6D27A"/><stop offset=".55" stop-color="#D9A534"/><stop offset="1" stop-color="#A9781E"/></radialGradient></defs>
+<path d="M40,3 C47,4 51,2 56,6 C62,9 67,10 70,16 C74,22 78,26 77,33 C76,40 79,45 76,51 C73,58 72,63 66,67 C60,71 56,76 49,77 C42,78 37,79 31,76 C24,73 18,72 14,66 C9,60 4,56 4,48 C4,41 1,36 4,29 C7,22 9,17 15,12 C21,8 26,4 33,4 C36,3 38,3 40,3Z" fill="url(#wx)"/>
+<circle cx="40" cy="40" r="25" fill="none" stroke="#9C6E18" stroke-width="1.6" opacity=".7"/>
+<path d="M22,48 L22,40 A18,18 0 0 1 58,40 L58,48 L50,48 L50,41 A10,10 0 0 0 30,41 L30,48Z" fill="#B9862A" stroke="#8A6114" stroke-width=".8"/>
+<path d="M35,22 L45,22 L43,33 L37,33Z" fill="#FBE3A2" stroke="#8A6114" stroke-width=".8"/></svg></div></div>
+ </div>
+ <div class="stage">
+ <form class="login" autocomplete="off">
+  <div class="field"><label for="u">帳號</label><input id="u" name="u" autocapitalize="off" autocorrect="off" spellcheck="false" required></div>
+  <div class="field"><label for="p">通行密碼</label><input id="p" name="p" type="password" required></div>
+  <div class="err" role="alert"></div>
+  <button class="btn-open" type="submit">開啟信封</button>
+ </form>
+ <div class="welcome"><div class="w1">Welcome</div><div class="w2"></div><div class="w3"></div></div>
+ </div>
+ <div class="g-hint">建議開啟聲音，在安靜的地方開啟這封信</div>
+</section>
+<main id="letter" class="hidden"><article class="paper"></article>
+ <div class="foot"><button class="again" type="button">重新開啟信封</button><span class="kt">KTeystone Design</span></div></main>
+<script>Promise.all([fetch('data/mark.json').then(r=>r.json()),fetch('data/letters.json').then(r=>r.json())]).then(([m,v])=>{window.__MARK__=m;window.__VAULT__=v;var s=document.createElement('script');s.src='assets/app.js';document.body.appendChild(s);});</script>
+</body></html>
