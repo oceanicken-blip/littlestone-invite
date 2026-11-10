@@ -160,3 +160,15 @@ form.login.leave{opacity:0;transform:translateY(14px);pointer-events:none}
   .p{font-size:15.5px;line-height:2}
   .sign{text-align:center}
 }
+
+/* guest letter: features */
+.feat{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.feat .ft{background:var(--stone);border-radius:16px;padding:20px 18px 20px;text-align:center}
+.feat .fi{width:52px;height:52px;margin:0 auto;border-radius:50%;background:var(--navy);color:var(--gold-hi);display:grid;place-items:center}
+.feat .fi svg{width:30px;height:30px}
+.feat .fn{font-family:var(--serif);font-weight:600;font-size:14px;color:var(--gold-ink);letter-spacing:.12em;margin-top:10px}
+.feat .t{font-family:var(--tc);font-weight:600;font-size:16px;color:var(--navy);letter-spacing:.06em;margin-top:4px;line-height:1.5}
+.feat .d{font-size:13.5px;color:var(--mute);line-height:1.8;margin-top:8px;text-align:left}
+@media (max-width:520px){.feat{grid-template-columns:1fr}}
+/* names render in the full-coverage serif */
+.welcome .w2,.dear,.stamp .s2{font-family:'LSName',var(--tc)}

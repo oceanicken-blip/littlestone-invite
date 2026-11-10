@@ -139,6 +139,31 @@ async function open(user, pass){
   catch(e){ return null; }
 }
 
+const b64u = s => b64(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4));
+const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function pbkdf(pass, salt, n){ const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass.trim()), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:n, hash:'SHA-256'}, base, {name:'AES-GCM', length:256}, false, ['decrypt']); }
+/* guest letters: the link carries {name, key} sealed with the guest's own password */
+async function openGuest(token, pass){
+  try {
+    const raw = b64u(token), salt = raw.slice(0, 16), iv = raw.slice(16, 28), ct = raw.slice(28);
+    const key = await pbkdf(pass, salt, 120000);
+    const g = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM', iv}, key, ct)));
+    const tpl = await (await fetch('data/guest.json', {cache:'no-store'})).json();
+    const K = await crypto.subtle.importKey('raw', b64(g.k), 'AES-GCM', false, ['decrypt']);
+    const html = new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM', iv:b64(tpl.i)}, K, b64(tpl.c)));
+    const n = esc(g.n), sh = esc(g.s || g.n);
+    return {id:'g-' + g.s, welcome:'歡迎，' + g.n, welcomeEn:'Welcome to Little Stone Dental', short:g.s || g.n, html:html.replace(/\{\{SALUTE\}\}/g, n).replace(/\{\{SHORT\}\}/g, sh)};
+  } catch(e){ return null; }
+}
+const GUEST = (location.hash.match(/[#&]g=([A-Za-z0-9_-]+)/) || [])[1];
+if (GUEST){
+  const f = $('#u').closest('.field'); f.classList.add('hidden'); $('#u').required = false;
+  $('label[for=p]').textContent = '請輸入您的通行密碼';
+  $('.g-title').textContent = '來自小石頭牙醫的一封信'; $('.g-sub').textContent = 'A letter from Little Stone Dental'; document.title = '小石頭牙醫｜一封給您的信';
+  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/ext.css'; document.head.appendChild(l);
+}
+
 /* ---------------------------------------------------------------- gate */
 const stopDust = dust();
 drawMark($('.env-letter .mini'));
@@ -152,12 +177,12 @@ $('form.login').addEventListener('submit', async e => {
   e.preventDefault();
   SFX.init();
   const btn = $('.btn-open'), err = $('.err'); btn.disabled = true; err.textContent = '';
-  const data = await open($('#u').value, $('#p').value);
+  const data = GUEST ? await openGuest(GUEST, $('#p').value) : await open($('#u').value, $('#p').value);
   if (!data){
-    btn.disabled = false; err.textContent = '帳號或密碼不正確，請再試一次';
+    btn.disabled = false; err.textContent = GUEST ? '通行密碼不正確，請再試一次' : '帳號或密碼不正確，請再試一次';
     const f = $('form.login'); f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); SFX.stone(.6, .4); return;
   }
-  try { localStorage.setItem('ls-user', $('#u').value.trim().toLowerCase()); } catch(e){}
+  if (!GUEST) try { localStorage.setItem('ls-user', $('#u').value.trim().toLowerCase()); } catch(e){}
   ceremony(data);
 });
 
@@ -200,9 +225,9 @@ function render(data){
   const io = new IntersectionObserver(es => es.forEach(en => { if (!en.isIntersecting) return; const el = en.target; io.unobserve(el); el.classList.add('on'); onReveal(el); }), {threshold:.25});
   $$('.reveal', L).forEach(el => io.observe(el));
   const k = 'ls-pledge-' + data.id; let done = null; try { done = localStorage.getItem(k); } catch(e){}
-  if (done) showStamp(data, done, false);
+  if ($('.btn-pledge', L)){ if (done) showStamp(data, done, false);
   $('.btn-pledge', L).addEventListener('click', () => { const d = new Date(); const ds = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-    try { localStorage.setItem(k, ds); } catch(e){} showStamp(data, ds, true); });
+    try { localStorage.setItem(k, ds); } catch(e){} showStamp(data, ds, true); }); }
   $('.again', document).addEventListener('click', () => location.reload());
 }
 function onReveal(el){
@@ -215,6 +240,8 @@ function onReveal(el){
       $$('.row', el).forEach((r, i) => { r.animate([{opacity:0, transform:'translateX(10px)'},{opacity:1, transform:'none'}], {duration:600, delay:500 + i*220, fill:'both'}); later(500 + i*220, () => SFX.tick(.06)); });
       later(500 + 6*220 + 200, () => SFX.chime(.22, 587)); }
   else if (t === 'fig'){ SFX.whoosh(.9, .08); later(400, () => SFX.ping(.12, 1046)); }
+  else if (t === 'feat'){ $$('.ft', el).forEach((c, i) => { c.animate([{opacity:0, transform:'translateY(14px) scale(.97)'},{opacity:1, transform:'none'}], {duration:700, delay:i*260, easing:'cubic-bezier(.2,.7,.2,1)', fill:'both'}); later(i*260 + 200, () => SFX.ping(.13, [659, 784, 988, 1175][i])); });
+      later(4*260 + 400, () => SFX.chime(.22, 523)); }
   else if (t === 'cta'){ SFX.ping(.14, 659); later(160, () => SFX.ping(.12, 988)); }
   else SFX.whoosh(.7, .05);
 }
