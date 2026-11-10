@@ -12,7 +12,7 @@
   --paper:#FDFCFA; --stone:#F5F3EF; --sand:#F1E9DB; --fog:#EEF2F4; --mist:#A9BAC6;
   --gold:#E3B23C; --gold-ink:#8A6714; --gold-hi:#F3CC6E;
   --serif:"Cormorant","Noto Serif TC",serif; --sc:"CormorantSC","Cormorant",serif;
-  --tc:"Noto Serif TC","Songti TC","PMingLiU",serif; --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --tc:"Noto Serif TC","LSSerifX","Songti TC","PMingLiU",serif; --sans:"Noto Sans TC","LSSansX","PingFang TC","Microsoft JhengHei",sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%;background:var(--deep)}
@@ -171,4 +171,3 @@ form.login.leave{opacity:0;transform:translateY(14px);pointer-events:none}
 .feat .d{font-size:13.5px;color:var(--mute);line-height:1.8;margin-top:8px;text-align:left}
 @media (max-width:520px){.feat{grid-template-columns:1fr}}
 /* names render in the full-coverage serif */
-.welcome .w2,.dear,.stamp .s2{font-family:'LSName',var(--tc)}

@@ -144,30 +144,30 @@ const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',
 async function pbkdf(pass, salt, n){ const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass.trim()), 'PBKDF2', false, ['deriveKey']);
   return crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:n, hash:'SHA-256'}, base, {name:'AES-GCM', length:256}, false, ['decrypt']); }
 /* guest letters: the link carries {name, key} sealed with the guest's own password */
-async function openGuest(token, pass){
+async function openGuest(token, user, pass){
   try {
     const raw = b64u(token), salt = raw.slice(0, 16), iv = raw.slice(16, 28), ct = raw.slice(28);
-    const key = await pbkdf(pass, salt, 120000);
+    const key = await pbkdf(user.trim().toLowerCase() + ':' + pass.trim(), salt, 120000);
     const g = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM', iv}, key, ct)));
-    const tpl = await (await fetch('data/guest.json', {cache:'no-store'})).json();
+    const enc = await (await fetch('data/guest.json', {cache:'no-store'})).json();
     const K = await crypto.subtle.importKey('raw', b64(g.k), 'AES-GCM', false, ['decrypt']);
-    const html = new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM', iv:b64(tpl.i)}, K, b64(tpl.c)));
-    const n = esc(g.n), sh = esc(g.s || g.n);
-    return {id:'g-' + g.s, welcome:'歡迎，' + g.n, welcomeEn:'Welcome to Little Stone Dental', short:g.s || g.n, html:html.replace(/\{\{SALUTE\}\}/g, n).replace(/\{\{SHORT\}\}/g, sh)};
+    const G = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM', iv:b64(enc.i)}, K, b64(enc.c))));
+    const T = G.tpl.find(t => t.id === g.t) || G.tpl[0];
+    const paras = t => t.split(/\n+/).map(x => x.trim()).filter(Boolean).map(x => `<p class="p">${esc(x)}</p>`).join('');
+    const html = G.html.replace(/\{\{SALUTE\}\}/g, esc(g.n)).replace('{{OPEN}}', paras(g.o || T.open)).replace('{{CLOSE}}', paras(g.c || T.close));
+    return {id:'g-' + g.s, welcome:'歡迎，' + g.n, welcomeEn:'Welcome to Little Stone Dental', short:g.s, html};
   } catch(e){ return null; }
 }
 const GUEST = (location.hash.match(/[#&]g=([A-Za-z0-9_-]+)/) || [])[1];
 if (GUEST){
-  const f = $('#u').closest('.field'); f.classList.add('hidden'); $('#u').required = false;
-  $('label[for=p]').textContent = '請輸入您的通行密碼';
+  $('#u').value = '';
   $('.g-title').textContent = '來自小石頭牙醫的一封信'; $('.g-sub').textContent = 'A letter from Little Stone Dental'; document.title = '小石頭牙醫｜一封給您的信';
-  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'assets/ext.css'; document.head.appendChild(l);
 }
 
 /* ---------------------------------------------------------------- gate */
 const stopDust = dust();
 drawMark($('.env-letter .mini'));
-try { const u = localStorage.getItem('ls-user'); if (u) $('#u').value = u; } catch(e){}
+if (!location.hash.includes('g=')) try { const u = localStorage.getItem('ls-user'); if (u) $('#u').value = u; } catch(e){}
 const snd = $('.sound');
 const paintSnd = () => snd.classList.toggle('off', !SFX.on);
 paintSnd();
@@ -177,9 +177,9 @@ $('form.login').addEventListener('submit', async e => {
   e.preventDefault();
   SFX.init();
   const btn = $('.btn-open'), err = $('.err'); btn.disabled = true; err.textContent = '';
-  const data = GUEST ? await openGuest(GUEST, $('#p').value) : await open($('#u').value, $('#p').value);
+  const data = GUEST ? await openGuest(GUEST, $('#u').value, $('#p').value) : await open($('#u').value, $('#p').value);
   if (!data){
-    btn.disabled = false; err.textContent = GUEST ? '通行密碼不正確，請再試一次' : '帳號或密碼不正確，請再試一次';
+    btn.disabled = false; err.textContent = '帳號或密碼不正確，請再試一次';
     const f = $('form.login'); f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); SFX.stone(.6, .4); return;
   }
   if (!GUEST) try { localStorage.setItem('ls-user', $('#u').value.trim().toLowerCase()); } catch(e){}
